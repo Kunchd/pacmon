@@ -26,12 +26,18 @@ class Machine:
      self.cores = cores
      self.cores_free = cores
 
+  def can_do_job(self, job):
+    return self.mem_free >= job.mem and self.cores_free >= job.cores
+
   def add_job(self, job):
     self.jobs.append(job)
     self.mem_free -= job.mem
     self.cores_free -= job.cores
 
   def forward(self, t): # forward pass
+    if self.cores_free == self.cores:
+      # no jobs right now, skip
+      return
     decr = self.cores / (self.cores - self.cores_free)
 
     for i in reversed(range(len(self.jobs))):
@@ -67,8 +73,3 @@ class Cell:
     # Then run forward on each machine
     for machine in self.machines:
       machine.forward(t)
-
-
-
-
-
