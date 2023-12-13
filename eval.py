@@ -70,7 +70,7 @@ def run_test(
     cell.forward(i)
 
   # check if we have unfinished jobs at the end - if so, keep running to finish them
-  print("Unfinished jobs, keep running", file=sys.stderr)
+  # print("Unfinished jobs, keep running", file=sys.stderr)
   while cell.is_inactive():
     cell.forward(i)
     i += 1
