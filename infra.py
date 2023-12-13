@@ -45,7 +45,7 @@ class Machine:
       # if job compute <= 0, take it out of the jobs list
       self.jobs[i].compute -= decr
       if self.jobs[i].compute <= 0:
-        print(f"Latency {self.jobs[i]}: {t - self.jobs[i].start}")
+        print(f"Latency {self.jobs[i]}: {t+1 - self.jobs[i].start}")
         self.cores_free += self.jobs[i].cores
         self.mem_free += self.jobs[i].mem
         self.jobs.pop(i)
@@ -59,6 +59,14 @@ class Cell:
     self.sched = sched # scheduler type
     self.sched_queue = [] # list of jobs that haven't been assigned to machine
     self.machines = []
+
+  def is_inactive(self) -> bool:
+    if len(self.sched_queue) > 0:
+      return True
+    for machine in self.machines:
+      if len(machine.jobs) > 0:
+        return True
+    return False
 
   def add_machine(self, machine):
     self.machines.append(machine)

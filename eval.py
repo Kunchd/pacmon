@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 from infra import *
 
@@ -19,10 +20,10 @@ JOB_DISTR = {
   "large": 20
 }
 
-TOTAL_STEPS = 1_000_000
+TOTAL_STEPS = 100_000
 
 def run_test(
-  load=100_000,
+  load=100_000, # number of total jobs
   machine_distr=MACHINE_DISTR,
   job_distr=JOB_DISTR,
   workload_type="uniform", # uniform, bursty
@@ -31,7 +32,7 @@ def run_test(
   num_machines=100
 ):
   cell = Cell(scheduler)
-  # Initialize machines here
+  # Initialize machines
   for i in range(num_machines):
     probab = np.random.uniform(0, 100)
     if probab <= machine_distr["small"]:
@@ -67,4 +68,10 @@ def run_test(
 
     # Run scheduler to actually assign jobs to machines
     cell.forward(i)
+
+  # check if we have unfinished jobs at the end - if so, keep running to finish them
+  print("Unfinished jobs, keep running", file=sys.stderr)
+  while cell.is_inactive():
+    cell.forward(i)
+    i += 1
 
