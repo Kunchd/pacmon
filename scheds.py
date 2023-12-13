@@ -12,7 +12,7 @@ class NaiveScheduler(Scheduler):
     while len(sched_queue) > 0:
       # Looking at job at front of scheduler queue
       job = sched_queue[0]
-      for machine in machines:
+      for i, machine in enumerate(machines):
         # If machine can take the job, do it
         if machine.can_do_job(job):
           machine.add_job(job)

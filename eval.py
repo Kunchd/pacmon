@@ -3,17 +3,14 @@ import sys
 
 from infra import *
 
+def dprint(msg):
+  print(msg, file=sys.stderr)
+
 # input to run a test:
 # - distribution of machines (small, medium, large)
 # - distribution of jobs (small, large)
 # - type of workload (uniform, bursty)
 # - scheduler type
-
-MACHINE_DISTR = {
-  "small": 50,
-  "medium": 30,
-  "large": 20
-}
 
 JOB_DISTR = {
   "small": 80,
@@ -23,27 +20,31 @@ JOB_DISTR = {
 TOTAL_STEPS = 100_000
 
 def run_test(
-  load=100_000, # number of total jobs
-  machine_distr=MACHINE_DISTR,
+  load:int =100_000, # number of total jobs
+  machine_config=None,
   job_distr=JOB_DISTR,
-  workload_type="uniform", # uniform, bursty
+  workload_type:str ="uniform", # uniform, bursty
   scheduler=None,
-  total_steps=TOTAL_STEPS,
-  num_machines=100
+  total_steps:int =TOTAL_STEPS,
+  num_machines:int =100
 ):
+  # dprint(f"Total steps {total_steps}")
+  # dprint(f"Load {load}")
+  # dprint(f"Machines {num_machines}")
+
   cell = Cell(scheduler)
   # Initialize machines
-  for i in range(num_machines):
-    probab = np.random.uniform(0, 100)
-    if probab <= machine_distr["small"]:
-      cell.add_machine(Machine(mem=6, cores=4))
-    elif probab <= machine_distr["small"] + machine_distr["medium"]:
-      cell.add_machine(Machine(mem=64, cores=10))
-    elif probab <= 100:
-      cell.add_machine(Machine(mem=1000, cores=32))
-    else:
-      raise Exception("Invalid machine type")
-
+  with open(machine_config, "r") as f:
+    for row in f:
+      row = row.strip()
+      if row == "small":
+        cell.add_machine(Machine(mem=6, cores=4))
+      elif row == "medium":
+        cell.add_machine(Machine(mem=64, cores=10))
+      elif row == "large":
+        cell.add_machine(Machine(mem=1000, cores=32))
+      else:
+        raise Exception(f"invalid machine type: '{row}'")
 
   num_jobs = np.zeros(total_steps, dtype=int)
   if workload_type == "uniform":
@@ -61,10 +62,8 @@ def run_test(
       prob = np.random.uniform(0, 100)
       if prob <= job_distr["small"]:
         cell.queue_job(Job(f"{i}-{j}", mem=2, cores=1, compute=np.random.randint(1, 11), start=i))
-      elif prob <= 100:
-        cell.queue_job(Job(f"{i}-{j}", mem=64, cores=10, compute=np.random.randint(20, 41), start=i))
       else:
-        raise Exception("Invalid job type")
+        cell.queue_job(Job(f"{i}-{j}", mem=64, cores=10, compute=np.random.randint(20, 41), start=i))
 
     # Run scheduler to actually assign jobs to machines
     cell.forward(i)
