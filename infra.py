@@ -89,7 +89,7 @@ class Cell:
 
   def forward(self, t):
     # run scheduler - assign things to machines
-    self.sched.forward(self.machines, self.sched_queue)
+    self.sched.forward(self.machines, self.sched_queue, t)
 
     # Then run forward on each machine
     for machine in self.machines:

@@ -13,8 +13,8 @@ def dprint(msg):
 # - scheduler type
 
 JOB_DISTR = {
-  "small": 80,
-  "large": 20
+  "small": 90,
+  "large": 10
 }
 
 TOTAL_STEPS = 100_000
@@ -40,7 +40,7 @@ def run_test(
       if row == "small":
         cell.add_machine(Machine(mem=6, cores=4))
       elif row == "medium":
-        cell.add_machine(Machine(mem=64, cores=10))
+        cell.add_machine(Machine(mem=64, cores=16))
       elif row == "large":
         cell.add_machine(Machine(mem=1000, cores=32))
       else:
@@ -61,7 +61,7 @@ def run_test(
     for j in range(num_jobs[i]):
       prob = np.random.uniform(0, 100)
       if prob <= job_distr["small"]:
-        cell.queue_job(Job(f"{i}-{j}", mem=2, cores=1, compute=np.random.randint(1, 11), start=i))
+        cell.queue_job(Job(f"{i}-{j}", mem=1, cores=1, compute=np.random.randint(8, 11), start=i))
       else:
         cell.queue_job(Job(f"{i}-{j}", mem=64, cores=10, compute=np.random.randint(20, 41), start=i))
 
