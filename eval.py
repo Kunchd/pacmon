@@ -19,6 +19,8 @@ JOB_DISTR = {
 
 TOTAL_STEPS = 100_000
 
+SCHED_INTV = 10
+
 def run_test(
   load:int =100_000, # number of total jobs
   machine_config=None,
@@ -66,7 +68,8 @@ def run_test(
         cell.queue_job(Job(f"{i}-{j}", mem=64, cores=10, compute=np.random.randint(20, 41), start=i))
 
     # Run scheduler to actually assign jobs to machines
-    cell.forward(i)
+    if i % SCHED_INTV == 0:
+      cell.forward(i)
 
   # check if we have unfinished jobs at the end - if so, keep running to finish them
   # print("Unfinished jobs, keep running", file=sys.stderr)
