@@ -13,7 +13,7 @@ class Job:
     self.start = start
 
   def __repr__(self):
-    return f"Job {self.id}: compute left={self.compute}"
+    return f"Job {self.id}: compute left={self.compute}, cores: {self.cores}"
 
   def __str__(self):
     return f"{self.id}"
@@ -33,6 +33,11 @@ class Machine:
     self.jobs.append(job)
     self.mem_free -= job.mem
     self.cores_free -= job.cores
+  
+  def remove_job(self, job_index):
+    job = self.jobs.pop(job_index)
+    self.mem_free += job.mem
+    self.cores_free += job.cores
 
   def forward(self, t): # forward pass
     if self.cores_free == self.cores:
@@ -50,6 +55,14 @@ class Machine:
         self.mem_free += self.jobs[i].mem
         self.jobs.pop(i)
         # print("deleted job")
+  
+  def __repr__(self):
+    return str(self)
+
+  def __str__(self):
+    str_form = f'\nMachine: [cores free: {self.cores_free}, mem_free: {self.mem_free}]\n' +\
+               f'Jobs: {self.jobs}\n'
+    return str_form
 
 class Cell:
   """dump wrapper of scheduler"""
@@ -81,3 +94,9 @@ class Cell:
     # Then run forward on each machine
     for machine in self.machines:
       machine.forward(t)
+  
+  def __str__(self):
+    return '-----------Cell-----------\n' +\
+          f'Machines: {self.machines}' +\
+          f'sche queue: {self.sched_queue}\n' +\
+           '--------------------------'
