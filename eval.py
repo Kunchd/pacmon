@@ -54,7 +54,10 @@ def run_test(
     else:
       num_jobs[:] = load // total_steps
   # TODO: bursty case
+  elif workload_type == "bursty":
+    pass
 
+  # TODO: look at these job numbers again
   for i in range(total_steps):
     # Classify each job at current timestep
     for j in range(num_jobs[i]):

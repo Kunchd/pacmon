@@ -98,8 +98,8 @@ class Cell:
       machine.forward(t)
 
     # For every item remaining on the queue, punish it by adding 100 to total latency
-    for job in self.sched_queue:
-      job.queue_punish += 100
+    # for job in self.sched_queue:
+    #   job.queue_punish += 1
 
   def __str__(self):
     return "-----------Cell-----------\n" + \
