@@ -60,7 +60,7 @@ def run_test(
     for j in range(num_jobs[i]):
       prob = np.random.uniform(0, 100)
       if prob <= job_distr["small"]:
-        cell.queue_job(Job(f"{i}-{j}", mem=1, cores=1, compute=np.random.randint(1, 11), start=i))
+        cell.queue_job(Job(f"{i}-{j}", mem=1, cores=1, compute=np.random.randint(8, 11), start=i))
       else:
         cell.queue_job(Job(f"{i}-{j}", mem=64, cores=10, compute=np.random.randint(20, 25), start=i))
 
