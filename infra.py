@@ -94,12 +94,19 @@ class Cell:
     self.sched.forward(self.machines, self.sched_queue, t)
 
     # Then run forward on each machine
+    total_free = 0
+    total_cores = 0
     for machine in self.machines:
       machine.forward(t)
+      # calculate utilization
+      total_free += machine.cores_free
+      total_cores += machine.cores
+    
+    # print(f"total utilization: {(total_cores - total_free) / total_cores}")
 
-    # For every item remaining on the queue, punish it by adding 100 to total latency
+    # For every item remaining on the queue, punish it by adding 1 to total latency
     for job in self.sched_queue:
-      job.queue_punish += 100
+      job.queue_punish += 1
 
   def __str__(self):
     return "-----------Cell-----------\n" + \
