@@ -19,8 +19,6 @@ JOB_DISTR = {
 
 TOTAL_STEPS = 100_000
 
-SCHED_INTV = 10
-
 def run_test(
   load:int =100_000, # number of total jobs
   machine_config=None,
@@ -28,7 +26,6 @@ def run_test(
   workload_type:str ="uniform", # uniform, bursty
   scheduler=None,
   total_steps:int =TOTAL_STEPS,
-  num_machines:int =100
 ):
   # dprint(f"Total steps {total_steps}")
   # dprint(f"Load {load}")
@@ -63,16 +60,15 @@ def run_test(
     for j in range(num_jobs[i]):
       prob = np.random.uniform(0, 100)
       if prob <= job_distr["small"]:
-        cell.queue_job(Job(f"{i}-{j}", mem=2, cores=1, compute=np.random.randint(1, 11), start=i))
+        cell.queue_job(Job(f"{i}-{j}", mem=2, cores=1, compute=np.random.randint(3, 5), start=i))
       else:
-        cell.queue_job(Job(f"{i}-{j}", mem=64, cores=10, compute=np.random.randint(20, 41), start=i))
+        cell.queue_job(Job(f"{i}-{j}", mem=64, cores=10, compute=np.random.randint(20, 25), start=i))
 
     # Run scheduler to actually assign jobs to machines
-    if i % SCHED_INTV == 0:
-      cell.forward(i)
+    cell.forward(i)
 
   # check if we have unfinished jobs at the end - if so, keep running to finish them
-  # print("Unfinished jobs, keep running", file=sys.stderr)
+  print("Unfinished jobs, keep running", file=sys.stderr)
   while cell.is_inactive():
     cell.forward(i)
     i += 1
