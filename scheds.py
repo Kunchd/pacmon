@@ -24,6 +24,22 @@ class NaiveScheduler(Scheduler):
       else:
         return # blocked
 
+class BestFitScheduler(Scheduler):
+  def forward(machines, sched_queue):
+    while len(sched_queue) > 0:
+      job = sched_queue[0]
+      min_cost = None
+      chosen_machine = None
+      for machine in machines:
+        if machine.can_do_job(job):
+          cost = (machine.mem_free - job.mem) + (machine.cores_free - job.cores)
+          if min_cost is None or cost < min_cost:
+            min_cost = cost
+            chosen_machine = machine
+      if min_cost is None:
+        return # blocked
+      chosen_machine.add_job(job)
+      sched_queue.pop(0)
 
 class EPVMScheduler(Scheduler):
   def forward(machines, sched_queue, time_step=None):
@@ -32,7 +48,7 @@ class EPVMScheduler(Scheduler):
 
     def cost(num_machines, pos_util, neg_util):
       return num_machines ** pos_util - num_machines ** neg_util
-    
+
     # Assignment logic
     while len(sched_queue) > 0:
       min_cost = float('inf')
@@ -48,7 +64,7 @@ class EPVMScheduler(Scheduler):
           if marginal_cost < min_cost:
             machine_pick = i
             min_cost = marginal_cost
-      
+
       if machine_pick < 0:
         break # block on jobs that can't be fit
 
@@ -73,12 +89,13 @@ class EPVMScheduler(Scheduler):
             m2_existing_util = (machine2.cores - machine2.cores_free) / machine2.cores
             # marginal_cost = cost(len(machines), m2_existing_util + job_util, m2_existing_util)
             marginal_cost = m2_existing_util + job_util
-            
+
             if marginal_cost < min_cost:
               machine_pick = j
               min_cost = marginal_cost
-        
+
         # transfer if necessary
         if machine_pick >= 0:
           machine.remove_job(i)
           machines[machine_pick].add_job(job)
+
