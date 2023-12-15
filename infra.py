@@ -52,7 +52,7 @@ class Machine:
       # if job compute <= 0, take it out of the jobs list
       self.jobs[i].compute -= decr
       if self.jobs[i].compute <= 0:
-        print(f"Latency {self.jobs[i]}: {t+1 - self.jobs[i].start + self.jobs[i].queue_punish}")
+        print(f"Latency {self.jobs[i]}: {t+1 - self.jobs[i].start}")
         self.cores_free += self.jobs[i].cores
         self.mem_free += self.jobs[i].mem
         self.jobs.pop(i)
@@ -97,7 +97,7 @@ class Cell:
     for machine in self.machines:
       machine.forward(t)
 
-    # For every item remaining on the queue, punish it by adding 100 to total latency
+    # For every item remaining on the queue, punish it by adding 1 to total latency
     # for job in self.sched_queue:
     #   job.queue_punish += 1
 

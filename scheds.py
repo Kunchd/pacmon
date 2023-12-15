@@ -25,7 +25,7 @@ class NaiveScheduler(Scheduler):
         return # blocked
 
 class BestFitScheduler(Scheduler):
-  def forward(machines, sched_queue):
+  def forward(machines, sched_queue, time_step=None):
     while len(sched_queue) > 0:
       job = sched_queue[0]
       min_cost = None
