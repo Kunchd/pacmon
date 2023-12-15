@@ -12,6 +12,8 @@ class Job:
     self.compute = compute # amount of compute left to do
     self.start = start
 
+    self.queue_punish = 0
+
   def __repr__(self):
     return f"Job {self.id}: compute left={self.compute}, cores: {self.cores}"
 
@@ -33,7 +35,7 @@ class Machine:
     self.jobs.append(job)
     self.mem_free -= job.mem
     self.cores_free -= job.cores
-  
+
   def remove_job(self, job_index):
     job = self.jobs.pop(job_index)
     self.mem_free += job.mem
@@ -50,12 +52,12 @@ class Machine:
       # if job compute <= 0, take it out of the jobs list
       self.jobs[i].compute -= decr
       if self.jobs[i].compute <= 0:
-        print(f"Latency {self.jobs[i]}: {t+1 - self.jobs[i].start}")
+        print(f"Latency {self.jobs[i]}: {t+1 - self.jobs[i].start + self.jobs[i].queue_punish}")
         self.cores_free += self.jobs[i].cores
         self.mem_free += self.jobs[i].mem
         self.jobs.pop(i)
         # print("deleted job")
-  
+
   def __repr__(self):
     return str(self)
 
@@ -94,9 +96,13 @@ class Cell:
     # Then run forward on each machine
     for machine in self.machines:
       machine.forward(t)
-  
+
+    # For every item remaining on the queue, punish it by adding 100 to total latency
+    for job in self.sched_queue:
+      job.queue_punish += 100
+
   def __str__(self):
-    return '-----------Cell-----------\n' +\
-          f'Machines: {self.machines}' +\
-          f'sche queue: {self.sched_queue}\n' +\
-           '--------------------------'
+    return "-----------Cell-----------\n" + \
+          f"Machines: {self.machines}" + \
+          f"sched queue: {self.sched_queue}\n" + \
+           "--------------------------"

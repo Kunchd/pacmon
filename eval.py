@@ -26,7 +26,6 @@ def run_test(
   workload_type:str ="uniform", # uniform, bursty
   scheduler=None,
   total_steps:int =TOTAL_STEPS,
-  num_machines:int =100
 ):
   # dprint(f"Total steps {total_steps}")
   # dprint(f"Load {load}")
@@ -63,7 +62,7 @@ def run_test(
       if prob <= job_distr["small"]:
         cell.queue_job(Job(f"{i}-{j}", mem=1, cores=1, compute=np.random.randint(8, 11), start=i))
       else:
-        cell.queue_job(Job(f"{i}-{j}", mem=64, cores=10, compute=np.random.randint(20, 41), start=i))
+        cell.queue_job(Job(f"{i}-{j}", mem=64, cores=10, compute=np.random.randint(20, 25), start=i))
 
     # Run scheduler to actually assign jobs to machines
     cell.forward(i)
