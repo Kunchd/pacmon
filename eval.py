@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+from scipy.stats import beta
 
 from infra import *
 
@@ -24,6 +25,7 @@ def run_test(
   machine_config=None,
   job_distr=JOB_DISTR,
   workload_type:str ="uniform", # uniform, bursty
+  workload_config:str = None,
   scheduler=None,
   total_steps:int =TOTAL_STEPS,
 ):
@@ -47,6 +49,7 @@ def run_test(
 
   num_jobs = np.zeros(total_steps, dtype=int)
   if workload_type == "uniform":
+    # dprint("uniform")
     if load <= total_steps:
       # give out a job every total_steps
       intv = total_steps // load
@@ -55,7 +58,14 @@ def run_test(
       num_jobs[:] = load // total_steps
   # TODO: bursty case
   elif workload_type == "bursty":
-    pass
+    # dprint("bursty")
+    # Generate beta distribution then shuffle
+    # Actual number of jobs for a timestep = round(some probability * total load)
+    # For better reproducibility, use pre-configured bursty workload
+    y = np.loadtxt(workload_config)
+    num_jobs = (load * y).astype(int)
+  else:
+    dprint("invalid workload")
 
   # TODO: look at these job numbers again
   for i in range(total_steps):
